@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<GetCompetitivePricingConfig>
+    <Account>
+        <accessKey value="replaceWithAccessKey">
+        <secretKey value="replaceWithSecretKey">
+        <appName value="replaceWithAppName">
+        <appVersion value="replaceWithAppVersion">
+        <serviceURL value="replaceWithServiceURL">
+        <sellerId value="A1MZ1G2HEVXJ5F">
+        <mwsAuthToken value="amzn.mws.f4a764a0-f3a3-c93a-f7ad-1afd1da799be">
+        <marketplaceId value="ATVPDKIKX0DER">
+    </Account>
+    <RequestASINList>
+        <ASIN value="">
+        <ASIN value="">
+        <ASIN value="">
+        <ASIN value="">
+    </ASINList>
+</GetCompetitivePricingConfig>
+<SubmitPrice>
+    <Account>
+        <accessKey value="replaceWithAccessKey">
+        <secretKey value="replaceWithSecretKey">
+        <appName value="replaceWithAppName">
+        <appVersion value="replaceWithAppVersion">
+        <serviceURL value="replaceWithServiceURL">
+        <sellerId value="A1MZ1G2HEVXJ5F">
+        <mwsAuthToken value="amzn.mws.f4a764a0-f3a3-c93a-f7ad-1afd1da799be">
+        <marketplaceId value="ATVPDKIKX0DER">
+    </Account>
+    <RequestASINList>
+        <ASIN value="">
+        <ASIN value="">
+        <ASIN value="">
+        <ASIN value="">
+    </ASINList>
+</GetCompetitivePricingConfig>
