@@ -229,7 +229,7 @@ public class  AutoSubmitPriceApp {
             		String itemCondition      = offer.getQualifiers().getItemCondition();
             		String itemSubCondition   = offer.getQualifiers().getItemSubcondition();
             		
-            		Float price = offer.getPrice().getListingPrice().getAmount().floatValue();
+            		Float price = offer.getPrice().getLandedPrice().getAmount().floatValue();
             		MyPriceInfo priceObj = mapMyPriceInfo.get(asin);
             		if ( null != priceObj ) {
             			
@@ -237,7 +237,7 @@ public class  AutoSubmitPriceApp {
             					&& priceObj.itemSubCondition.toUpperCase().equals(itemSubCondition.toUpperCase())
             					&& priceObj.fulfillmentChannel.toUpperCase().equals(fulfillmentChannel.toUpperCase()) )
             			{
-            				if ( (null == priceObj.lowest_ListingPrice) || (priceObj.lowest_ListingPrice > price) ) 
+            				if ( (null == priceObj.lowest_LandedPrice) || (priceObj.lowest_LandedPrice > price) ) 
             				{
             					priceObj.lowest_LandedPrice  = offer.getPrice().getLandedPrice().getAmount().floatValue();
             					priceObj.lowest_ListingPrice = offer.getPrice().getListingPrice().getAmount().floatValue();
@@ -370,8 +370,15 @@ public class  AutoSubmitPriceApp {
     
     
     public void CheckAndSubmitPrice() {
+    	for(Entry<String, MyPriceInfo> entry : mapMyPriceInfo.entrySet()){
+    		if ( entry.getValue().landedPrice != entry.getValue().lowest_LandedPrice ) {
+    			
+    		}
+    		
+    	}
     	
-    	SubmitFeedRequest request = new SubmitFeedRequest();
+    	
+    	/*SubmitFeedRequest request = new SubmitFeedRequest();
         request.setMerchant(AutoSubmitPriceConfig.sellerId);
         request.setMWSAuthToken(AutoSubmitPriceConfig.sellerDevAuthToken);
         request.setMarketplaceIdList(new IdList(Arrays.asList(
@@ -385,7 +392,7 @@ public class  AutoSubmitPriceApp {
 			e.printStackTrace();
 			return;
 		}
-    	SubmitPriceFeed(AutoSubmitPriceConfig.getServiceClient(), request);
+    	SubmitPriceFeed(AutoSubmitPriceConfig.getServiceClient(), request);*/
     }
 
     
@@ -475,7 +482,7 @@ public class  AutoSubmitPriceApp {
 	        request.setASINList(asinList);
 			String itemCondition = "new";
 			request.setItemCondition(itemCondition);
-			Boolean excludeMe = Boolean.valueOf(true);
+			Boolean excludeMe = Boolean.valueOf(false);
 			request.setExcludeMe(excludeMe);
 			
 			// Make the call.
