@@ -79,7 +79,8 @@ public class AutoSubmitPriceConfig {
     public static Logger log = Logger.getLogger("amazon-mws"); 
     
 
-    private static MarketplaceWebServiceProductsAsyncClient client = null;
+    private static MarketplaceWebServiceProductsAsyncClient productClient = null;
+    private static MarketplaceWebServiceClient              mwsClient = null;
     
     public static int InitConfig(String fileName) {
     	log.setLevel(Level.INFO);
@@ -122,14 +123,30 @@ public class AutoSubmitPriceConfig {
     }
 
     public static synchronized MarketplaceWebServiceProductsAsyncClient getAsyncProductClient() {
-        if (client==null) {
+        if (productClient==null) {
             MarketplaceWebServiceProductsConfig config = new MarketplaceWebServiceProductsConfig();
             config.setServiceURL(serviceURL);
             // Set other client connection configurations here.
-            client = new MarketplaceWebServiceProductsAsyncClient(accessKey, secretKey, 
+            productClient = new MarketplaceWebServiceProductsAsyncClient(accessKey, secretKey, 
                     appName, appVersion, config, null);
         }
-        return client;
+        return productClient;
+    }
+    
+  //Get Product client
+    public static MarketplaceWebService getServiceClient() {
+        return getAsyncServiceClient();
+    }
+
+    public static synchronized MarketplaceWebServiceClient getAsyncServiceClient() {
+        if (mwsClient==null) {
+            MarketplaceWebServiceConfig config = new MarketplaceWebServiceConfig();
+            config.setServiceURL(serviceURL);
+            // Set other client connection configurations here.
+            mwsClient = new MarketplaceWebServiceClient(
+            		accessKey, secretKey, appName, appVersion, config);
+        }
+        return mwsClient;
     }
 
     public static String toTxt() {
