@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<AmazonMWS>
+    <acct_accessKey>xxxx</acct_accessKey>
+    <acct_secretKey>xxxx</acct_secretKey>
+    <acct_appName>mumapp</acct_appName>
+    <acct_appVersion>V0.10</acct_appVersion>
+    <acct_serviceURL>https://mws.amazonservices.com</acct_serviceURL>
+    <acct_sellerId>xxxx</acct_sellerId>
+    <acct_mwsAuthToken>xxxxx</acct_mwsAuthToken>
+    <acct_marketplaceId>xxxxxx</acct_marketplaceId>
+    <RequestASINList>
+        <ASIN>B00L21BZ14</ASIN>
+        <ASIN>B004TI336W</ASIN>
+        <ASIN>B00EXBDWZC</ASIN>
+    </RequestASINList>
+    <HistoryPriceFile>F:/workspace/AmazonMWS3/conf/history_price.txt</HistoryPriceFile>
+    <LogFile>F:/workspace/AmazonMWS3/conf/get_price.log</LogFile>
+    <Strategy select="SetEQ|SetHigh|SetLow" type="SetEQ" common="当满足条件时设置我的价格和最低价格相同">
+        <ASIN>B00L21BZ14</ASIN>
+        <LimitMyPriceMin>10.25</LimitMyPriceMin>
+        <LimitMyPriceMax>10.45</LimitMyPriceMax>
+        <Condition>
+            <MyPriceHigh>0.05</MyPriceHigh>
+            <MyPriceLow>0.05</MyPriceLow>
+        </Condition>
+    </Strategy>
+    <Strategy select="SetEQ|SetHigh|SetLow" type="SetHigh" common="当满足条件时设置我的价格比最低价格高DiffValue">
+        <ASIN>B004TI336W</ASIN>
+        <LimitMyPriceMin>10.25</LimitMyPriceMin>
+        <LimitMyPriceMax>10.45</LimitMyPriceMax>
+        <DiffValue>0.01</DiffValue>
+        <Condition>
+            <MyPriceHigh>0.05</MyPriceHigh>
+            <MyPriceLow>0.05</MyPriceLow>
+        </Condition>
+    </Strategy>
+    <Strategy select="SetEQ|SetHigh|SetLow" type="SetLow" common="当满足条件时设置我的价格比最低价格低DiffValue">
+        <ASIN>B00EXBDWZC</ASIN>
+        <LimitMyPriceMin>10.25</LimitMyPriceMin>
+        <LimitMyPriceMax>10.45</LimitMyPriceMax>
+        <DiffValue>0.01</DiffValue>
+        <Condition>
+            <MyPriceHigh>0.05</MyPriceHigh>
+            <MyPriceLow>0.05</MyPriceLow>
+        </Condition>
+    </Strategy>
+</AmazonMWS>
