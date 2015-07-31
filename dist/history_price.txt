@@ -1,0 +1,58 @@
+
+
+ Adjust Price:B004TI336W==============Fri Jul 31 17:03:27 CST 2015
+ MyPriceInfo{
+ landedPrice       :7.01
+ listingPrice      :3.73
+ shippingPrice     :3.28
+ regularPrice      :3.73
+ fulfillmentChannel:MERCHANT
+ itemCondition     :New
+ itemSubCondition  :New
+ sellerId          :A1MZ1G2HEVXJ5F
+ sellerSKU         :KZ-F2BC-J4NB
+ lowest_NumberOfOfferListingsConsidered:3
+ lowest_SellerFeedbackCount            :8
+ lowest_LandedPrice                    :4.86
+ lowest_ListingPrice                   :4.86
+ lowest_Shipping                       :0.0
+ lowest_MultipleOffersAtLowestPrice    :False
+}
+
+ Adjust Price:B00L21BZ14==============Fri Jul 31 17:03:27 CST 2015
+ MyPriceInfo{
+ landedPrice       :10.35
+ listingPrice      :10.35
+ shippingPrice     :0.0
+ regularPrice      :10.35
+ fulfillmentChannel:AMAZON
+ itemCondition     :New
+ itemSubCondition  :New
+ sellerId          :A1MZ1G2HEVXJ5F
+ sellerSKU         :HF-XACT-X6DU
+ lowest_NumberOfOfferListingsConsidered:4
+ lowest_SellerFeedbackCount            :535
+ lowest_LandedPrice                    :10.25
+ lowest_ListingPrice                   :10.25
+ lowest_Shipping                       :0.0
+ lowest_MultipleOffersAtLowestPrice    :False
+}
+
+ Adjust Price:B00EXBDWZC==============Fri Jul 31 17:03:27 CST 2015
+ MyPriceInfo{
+ landedPrice       :49.97
+ listingPrice      :46.69
+ shippingPrice     :3.28
+ regularPrice      :46.69
+ fulfillmentChannel:MERCHANT
+ itemCondition     :New
+ itemSubCondition  :New
+ sellerId          :A1MZ1G2HEVXJ5F
+ sellerSKU         :IF-2DMD-DA0Z
+ lowest_NumberOfOfferListingsConsidered:5
+ lowest_SellerFeedbackCount            :0
+ lowest_LandedPrice                    :40.49
+ lowest_ListingPrice                   :35.0
+ lowest_Shipping                       :5.49
+ lowest_MultipleOffersAtLowestPrice    :False
+}

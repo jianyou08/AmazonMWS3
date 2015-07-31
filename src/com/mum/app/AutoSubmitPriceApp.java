@@ -19,31 +19,18 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 
-import javax.xml.datatype.XMLGregorianCalendar;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.math.BigDecimal;
 
 import com.amazonaws.mws.MarketplaceWebService;
-import com.amazonaws.mws.MarketplaceWebServiceClient;
 import com.amazonaws.mws.MarketplaceWebServiceException;
 import com.amazonaws.mws.model.FeedSubmissionInfo;
-import com.amazonaws.mws.model.IdList;
 import com.amazonaws.mws.model.ResponseMetadata;
 import com.amazonaws.mws.model.SubmitFeedRequest;
 import com.amazonaws.mws.model.SubmitFeedResponse;
 import com.amazonaws.mws.model.SubmitFeedResult;
-import com.amazonservices.mws.client.*;
 import com.amazonservices.mws.products.*;
 import com.amazonservices.mws.products.model.*;
-import com.amazonservices.mws.products.samples.GetCompetitivePricingForASINSample;
-import com.amazonservices.mws.products.samples.GetLowestOfferListingsForASINSample;
-import com.amazonservices.mws.products.samples.GetMyPriceForASINSample;
-import com.amazonservices.mws.products.samples.ListMatchingProductsSample;
 
 
 /** Sample call for GetMatchingProduct. */
@@ -370,13 +357,23 @@ public class  AutoSubmitPriceApp {
     
     
     public void CheckAndSubmitPrice() {
-    	for(Entry<String, MyPriceInfo> entry : mapMyPriceInfo.entrySet()){
-    		if ( entry.getValue().landedPrice != entry.getValue().lowest_LandedPrice ) {
-    			
-    		}
-    		
-    	}
-    	
+    	Date dt = new Date();
+		try {
+			FileWriter fileWriter = new FileWriter(AutoSubmitPriceConfig.historyPriceFile, true);
+			for(Entry<String, MyPriceInfo> entry : mapMyPriceInfo.entrySet()){
+	    		if ( entry.getValue().landedPrice != entry.getValue().lowest_LandedPrice ) {
+	    			String line;
+					line = "\r\n\r\n Adjust Price:" + entry.getKey() + "==============" +  dt.toString() + "\r\n";
+					fileWriter.write(line);
+					fileWriter.write(entry.getValue().toString()); 
+	    		}
+			}
+	    	fileWriter.flush();
+	     	fileWriter.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     	
     	/*SubmitFeedRequest request = new SubmitFeedRequest();
         request.setMerchant(AutoSubmitPriceConfig.sellerId);
