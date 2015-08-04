@@ -15,6 +15,8 @@
  */
 package com.mum.app;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -36,6 +38,8 @@ import com.amazonservices.mws.products.model.*;
 /** Sample call for GetMatchingProduct. */
 public class  AutoSubmitPriceApp {
 	class MyPriceInfo {
+		public String asin;
+		
 		//myprice info
 		public boolean  has_set_myprice = false;
 		public Float landedPrice;
@@ -67,6 +71,7 @@ public class  AutoSubmitPriceApp {
 		
 		public String toString() {
             String res = " MyPriceInfo{";
+            res += "\n asin              :" + asin;
             res += "\n landedPrice       :" + landedPrice;
             res += "\n listingPrice      :" + listingPrice;
             res += "\n shippingPrice     :" + shippingPrice;
@@ -95,6 +100,44 @@ public class  AutoSubmitPriceApp {
             return res;
 		}
 		
+		
+		public String toFormatString(String dtstring) {
+            String res = dtstring;
+            res += "," + asin;
+            res += "," + landedPrice;
+            res += "," + listingPrice;
+            res += "," + shippingPrice;
+            res += "," + regularPrice;
+            res += "," + fulfillmentChannel;
+            res += "," + itemCondition;
+            res += "," + itemSubCondition;
+            res += "," + sellerId;
+            res += "," + sellerSKU;
+            if ( has_set_competitive )
+            {
+                res += "," + competitive_LandedPrice;
+                res += "," + competitive_ListingPrice;
+                res += "," + competitive_Shipping;
+            }
+            else {
+            	res += ",,,";
+            }
+            if ( has_set_lowest )
+            {
+                res += "," + lowest_NumberOfOfferListingsConsidered;
+                res += "," + lowest_SellerFeedbackCount;
+                res += "," + lowest_LandedPrice;
+                res += "," + lowest_ListingPrice;
+                res += "," + lowest_Shipping;
+                res += "," + lowest_MultipleOffersAtLowestPrice;
+            }
+            else {
+            	res += ",,,,,,";
+            }
+            res += ",,,,,";
+            return res;
+		}
+		
 	}
 	private Map<String, MyPriceInfo> mapMyPriceInfo = new HashMap<String, MyPriceInfo>();
   
@@ -120,6 +163,7 @@ public class  AutoSubmitPriceApp {
             		String asin = resItem.getASIN();;
             		
             		MyPriceInfo priceInfo = new MyPriceInfo();
+            		priceInfo.asin              = asin;
             		priceInfo.landedPrice 		= offer.getBuyingPrice().getLandedPrice().getAmount().floatValue();
             		priceInfo.listingPrice 		= offer.getBuyingPrice().getListingPrice().getAmount().floatValue();
             		priceInfo.shippingPrice 	= offer.getBuyingPrice().getShipping().getAmount().floatValue();
@@ -375,40 +419,32 @@ public class  AutoSubmitPriceApp {
     
     public void CheckAndSubmitPrice() {
     	Date dt = new Date();
+    	DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	String dtstr = format.format(dt);
 		try {
 			FileWriter fileWriter = new FileWriter(AutoSubmitPriceConfig.historyPriceFile, true);
 			for(Entry<String, MyPriceInfo> entry : mapMyPriceInfo.entrySet()){
 	    		if ( entry.getValue().landedPrice != entry.getValue().lowest_LandedPrice ) {
-	    			String line;
-					line = "\n\n Adjust Price:" + entry.getKey() + "==============" +  dt.toString() + "\n";
-					fileWriter.write(line);
-					line = "=Price " + entry.getKey() + " " + entry.getValue().landedPrice + " " + entry.getValue().competitive_LandedPrice + " " + entry.getValue().lowest_LandedPrice + "\n";
-					fileWriter.write(line);
+	    			MyLog.log.info("Adjust Price:" + entry.getKey() + "==============" +  dtstr);
 					if ( entry.getValue().landedPrice < entry.getValue().competitive_LandedPrice  ) {
-						line = entry.getKey() + " LE CompetitivePrice\n";
-						fileWriter.write(line);
+						MyLog.log.info(entry.getKey() + " LE CompetitivePrice");
 					}
 					else if ( entry.getValue().landedPrice.equals(entry.getValue().competitive_LandedPrice) ) {
-						line = entry.getKey() + " EQ CompetitivePrice\n";
-						fileWriter.write(line);
+						MyLog.log.info(entry.getKey() + " EQ CompetitivePrice");
 					}
 					else {
-						line = entry.getKey() + " HQ CompetitivePrice\n";
-						fileWriter.write(line);
+						MyLog.log.info(entry.getKey() + " HQ CompetitivePrice");
 					}
 					if ( entry.getValue().landedPrice < entry.getValue().lowest_LandedPrice  ) {
-						line = entry.getKey() + " LE LowestPrice\n";
-						fileWriter.write(line);
+						MyLog.log.info(entry.getKey() + " LE LowestPrice");
 					}
 					else if ( entry.getValue().landedPrice.equals(entry.getValue().lowest_LandedPrice) ) {
-						line = entry.getKey() + " EQ LowestPrice\n";
-						fileWriter.write(line);
+						MyLog.log.info(entry.getKey() + " EQ LowestPrice");
 					}
 					else {
-						line = entry.getKey() + " HQ LowestPrice\n";
-						fileWriter.write(line);
+						MyLog.log.info(entry.getKey() + " HQ LowestPrice");
 					}
-					fileWriter.write(entry.getValue().toString()); 
+					fileWriter.write(entry.getValue().toFormatString(dtstr) + "\n"); 
 	    		}
 			}
 	    	fileWriter.flush();
