@@ -37,6 +37,7 @@ import com.amazonservices.mws.products.model.*;
 public class  AutoSubmitPriceApp {
 	class MyPriceInfo {
 		//myprice info
+		public boolean  has_set_myprice = false;
 		public Float landedPrice;
 		public Float listingPrice;	//当前价格，包含促销商品
 		public Float shippingPrice;
@@ -47,12 +48,18 @@ public class  AutoSubmitPriceApp {
 		public String sellerId;
 		public String sellerSKU;
 		
+		public boolean has_set_competitive = false;
+		public Float competitive_LandedPrice;
+		public Float competitive_ListingPrice;
+		public Float competitive_Shipping;
+		
 		//LowestOfferListing
+		public boolean has_set_lowest = false;
 		public int    lowest_NumberOfOfferListingsConsidered;
 		public int    lowest_SellerFeedbackCount;
-		public Float  lowest_LandedPrice = null;
-		public Float  lowest_ListingPrice = null;
-		public Float  lowest_Shipping = null;
+		public Float  lowest_LandedPrice;
+		public Float  lowest_ListingPrice;
+		public Float  lowest_Shipping;
 		public String lowest_MultipleOffersAtLowestPrice;
 		
 		public static final String FULFILLMENT_CHANNEL_AMAZON = "AMAZON";
@@ -69,7 +76,13 @@ public class  AutoSubmitPriceApp {
             res += "\n itemSubCondition  :" + itemSubCondition;
             res += "\n sellerId          :" + sellerId;
             res += "\n sellerSKU         :" + sellerSKU;
-            if ( null != lowest_LandedPrice )
+            if ( has_set_competitive )
+            {
+                res += "\n competitive_LandedPrice              :" + competitive_LandedPrice;
+                res += "\n competitive_ListingPrice             :" + competitive_ListingPrice;
+                res += "\n competitive_Shipping                 :" + competitive_Shipping;
+            }
+            if ( has_set_lowest )
             {
                 res += "\n lowest_NumberOfOfferListingsConsidered:" + lowest_NumberOfOfferListingsConsidered;
                 res += "\n lowest_SellerFeedbackCount            :" + lowest_SellerFeedbackCount;
@@ -84,60 +97,8 @@ public class  AutoSubmitPriceApp {
 		
 	}
 	private Map<String, MyPriceInfo> mapMyPriceInfo = new HashMap<String, MyPriceInfo>();
-    /**
-     * Call the service, log response and exceptions.
-     *
-     * @param client
-     * @param request
-     *
-     * @return The response.
-     */
-    public GetCompetitivePricingForASINResponse GetCompetitivePrice(
-            MarketplaceWebServiceProducts client, 
-            GetCompetitivePricingForASINRequest request) {
-        try {
-            // Call the service.
-            GetCompetitivePricingForASINResponse response = client.getCompetitivePricingForASIN(request);
-            ResponseHeaderMetadata rhmd = response.getResponseHeaderMetadata();
-            // We recommend logging every the request id and timestamp of every call.
-            System.out.println("Response:");
-            System.out.println("RequestId: "+rhmd.getRequestId());
-            System.out.println("Timestamp: "+rhmd.getTimestamp());
-            String responseXml = response.toXML();
-            System.out.println(responseXml);
-            MyLog.log.info(responseXml);
-            
-            List<GetCompetitivePricingForASINResult> resList = response.getGetCompetitivePricingForASINResult();
-            for (GetCompetitivePricingForASINResult resItem : resList)
-            {
-            	List<CompetitivePriceType> priceList = resItem.getProduct().getCompetitivePricing().getCompetitivePrices().getCompetitivePrice();
-            	for (CompetitivePriceType priceItem : priceList)
-            	{
-            		String asin = resItem.getASIN();
-            		//Float  price = priceItem.getPrice().getLandedPrice().getAmount().floatValue();
-            		Float  price = priceItem.getPrice().getListingPrice().getAmount().floatValue();
-            		System.out.println("Cpt:" + asin + ':' + price);
-            		MyLog.log.info("Cpt:" + asin + ':' + price);
-            		//mapProductPrice.put(asin, new ProductPrice(price, 0));
-            	}
-            }
-            
-            return response;
-        } catch (MarketplaceWebServiceProductsException ex) {
-            // Exception properties are important for diagnostics.
-            System.out.println("Service Exception:");
-            ResponseHeaderMetadata rhmd = ex.getResponseHeaderMetadata();
-            if(rhmd != null) {
-                System.out.println("RequestId: "+rhmd.getRequestId());
-                System.out.println("Timestamp: "+rhmd.getTimestamp());
-            }
-            System.out.println("Message: "+ex.getMessage());
-            System.out.println("StatusCode: "+ex.getStatusCode());
-            System.out.println("ErrorCode: "+ex.getErrorCode());
-            System.out.println("ErrorType: "+ex.getErrorType());
-            throw ex;
-        }
-    }
+  
+    
     
     public GetMyPriceForASINResponse GetMyPriceForASIN(
             MarketplaceWebServiceProducts client, 
@@ -191,6 +152,61 @@ public class  AutoSubmitPriceApp {
         }
     }
     
+    public GetCompetitivePricingForASINResponse GetCompetitivePrice(
+            MarketplaceWebServiceProducts client, 
+            GetCompetitivePricingForASINRequest request) {
+        try {
+            // Call the service.
+            GetCompetitivePricingForASINResponse response = client.getCompetitivePricingForASIN(request);
+            ResponseHeaderMetadata rhmd = response.getResponseHeaderMetadata();
+            // We recommend logging every the request id and timestamp of every call.
+            System.out.println("Response:");
+            System.out.println("RequestId: "+rhmd.getRequestId());
+            System.out.println("Timestamp: "+rhmd.getTimestamp());
+            String responseXml = response.toXML();
+            System.out.println(responseXml);
+            MyLog.log.info(responseXml);
+            
+            List<GetCompetitivePricingForASINResult> resList = response.getGetCompetitivePricingForASINResult();
+            for (GetCompetitivePricingForASINResult resItem : resList)
+            {
+            	List<CompetitivePriceType> priceList = resItem.getProduct().getCompetitivePricing().getCompetitivePrices().getCompetitivePrice();
+            	for (CompetitivePriceType priceItem : priceList)
+            	{
+            		String asin = resItem.getASIN();
+            		//Float  price = priceItem.getPrice().getLandedPrice().getAmount().floatValue();
+            		Float  price = priceItem.getPrice().getListingPrice().getAmount().floatValue();
+            		//System.out.println("Cpt:" + asin + ':' + price);
+            		//MyLog.log.info("Cpt:" + asin + ':' + price);
+            		
+            		MyPriceInfo priceObj = mapMyPriceInfo.get(asin);
+            		if ( null != priceObj ) {
+            			priceObj.has_set_competitive      = true;
+    					priceObj.competitive_LandedPrice  = priceItem.getPrice().getLandedPrice().getAmount().floatValue();
+    					priceObj.competitive_ListingPrice = priceItem.getPrice().getListingPrice().getAmount().floatValue();
+    					priceObj.competitive_Shipping 	  = priceItem.getPrice().getShipping().getAmount().floatValue();				
+    					MyLog.log.info(asin + priceObj.toString());
+            		}
+            	}
+            }
+            
+            return response;
+        } catch (MarketplaceWebServiceProductsException ex) {
+            // Exception properties are important for diagnostics.
+            System.out.println("Service Exception:");
+            ResponseHeaderMetadata rhmd = ex.getResponseHeaderMetadata();
+            if(rhmd != null) {
+                System.out.println("RequestId: "+rhmd.getRequestId());
+                System.out.println("Timestamp: "+rhmd.getTimestamp());
+            }
+            System.out.println("Message: "+ex.getMessage());
+            System.out.println("StatusCode: "+ex.getStatusCode());
+            System.out.println("ErrorCode: "+ex.getErrorCode());
+            System.out.println("ErrorType: "+ex.getErrorType());
+            throw ex;
+        }
+    }
+    
     
     public GetLowestOfferListingsForASINResponse GetLowestOfferListingsForASIN(
             MarketplaceWebServiceProducts client, 
@@ -226,6 +242,7 @@ public class  AutoSubmitPriceApp {
             			{
             				if ( (null == priceObj.lowest_LandedPrice) || (priceObj.lowest_LandedPrice > price) ) 
             				{
+            					priceObj.has_set_lowest      = true;
             					priceObj.lowest_LandedPrice  = offer.getPrice().getLandedPrice().getAmount().floatValue();
             					priceObj.lowest_ListingPrice = offer.getPrice().getListingPrice().getAmount().floatValue();
             					priceObj.lowest_Shipping 	 = offer.getPrice().getShipping().getAmount().floatValue();
@@ -363,8 +380,34 @@ public class  AutoSubmitPriceApp {
 			for(Entry<String, MyPriceInfo> entry : mapMyPriceInfo.entrySet()){
 	    		if ( entry.getValue().landedPrice != entry.getValue().lowest_LandedPrice ) {
 	    			String line;
-					line = "\r\n\r\n Adjust Price:" + entry.getKey() + "==============" +  dt.toString() + "\r\n";
+					line = "\n\n Adjust Price:" + entry.getKey() + "==============" +  dt.toString() + "\n";
 					fileWriter.write(line);
+					line = "=Price " + entry.getKey() + " " + entry.getValue().landedPrice + " " + entry.getValue().competitive_LandedPrice + " " + entry.getValue().lowest_LandedPrice + "\n";
+					fileWriter.write(line);
+					if ( entry.getValue().landedPrice < entry.getValue().competitive_LandedPrice  ) {
+						line = entry.getKey() + " LE CompetitivePrice\n";
+						fileWriter.write(line);
+					}
+					else if ( entry.getValue().landedPrice.equals(entry.getValue().competitive_LandedPrice) ) {
+						line = entry.getKey() + " EQ CompetitivePrice\n";
+						fileWriter.write(line);
+					}
+					else {
+						line = entry.getKey() + " HQ CompetitivePrice\n";
+						fileWriter.write(line);
+					}
+					if ( entry.getValue().landedPrice < entry.getValue().lowest_LandedPrice  ) {
+						line = entry.getKey() + " LE LowestPrice\n";
+						fileWriter.write(line);
+					}
+					else if ( entry.getValue().landedPrice.equals(entry.getValue().lowest_LandedPrice) ) {
+						line = entry.getKey() + " EQ LowestPrice\n";
+						fileWriter.write(line);
+					}
+					else {
+						line = entry.getKey() + " HQ LowestPrice\n";
+						fileWriter.write(line);
+					}
 					fileWriter.write(entry.getValue().toString()); 
 	    		}
 			}
@@ -423,7 +466,7 @@ public class  AutoSubmitPriceApp {
      *  Command line entry point.
      */
     public static void main(String[] args) {
-    	String confFileName = "./auto_update_price.xml";
+    	String confFileName = "E:/workspace/java/AmazonMWS3/dist/auto_update_price.xml";
     	if ( args.length > 0) {
     		confFileName = args[0];
     	}
@@ -439,20 +482,7 @@ public class  AutoSubmitPriceApp {
     	
     	MarketplaceWebServiceProductsClient client = AutoSubmitPriceConfig.getProductClient();
     	AutoSubmitPriceApp handler = new AutoSubmitPriceApp();
-    	//Get Competitive Price
-    	if ( false )
-    	{
-	        GetCompetitivePricingForASINRequest request = new GetCompetitivePricingForASINRequest();
-	        request.setSellerId(AutoSubmitPriceConfig.sellerId);
-	        request.setMWSAuthToken(AutoSubmitPriceConfig.sellerDevAuthToken);
-	        request.setMarketplaceId(AutoSubmitPriceConfig.marketplaceId);
-	        ASINListType asinList = new ASINListType();
-	        asinList.setASIN(AutoSubmitPriceConfig.reqAsinList);
-	        request.setASINList(asinList);
-	
-	        // Make the call.
-	        handler.GetCompetitivePrice(client, request);
-    	}
+    	
     	
     	//Get MyPrice
     	if ( true ){
@@ -466,6 +496,21 @@ public class  AutoSubmitPriceApp {
 	
 	        // Make the call.
 	        handler.GetMyPriceForASIN(client, request);
+    	}
+    	
+    	//Get Competitive Price
+    	if ( true )
+    	{
+	        GetCompetitivePricingForASINRequest request = new GetCompetitivePricingForASINRequest();
+	        request.setSellerId(AutoSubmitPriceConfig.sellerId);
+	        request.setMWSAuthToken(AutoSubmitPriceConfig.sellerDevAuthToken);
+	        request.setMarketplaceId(AutoSubmitPriceConfig.marketplaceId);
+	        ASINListType asinList = new ASINListType();
+	        asinList.setASIN(AutoSubmitPriceConfig.reqAsinList);
+	        request.setASINList(asinList);
+	
+	        // Make the call.
+	        handler.GetCompetitivePrice(client, request);
     	}
     	
     	//get Lowest Price
