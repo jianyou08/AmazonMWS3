@@ -21,7 +21,9 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.ArrayList;
@@ -52,6 +54,9 @@ import org.xml.sax.SAXException;
 
 import com.amazonaws.mws.*;
 import com.amazonaws.mws.model.*;
+import com.amazonservices.mws.client.AbstractMwsObject;
+import com.amazonservices.mws.client.MwsReader;
+import com.amazonservices.mws.client.MwsWriter;
 import com.amazonservices.mws.client.MwsXmlReader;
 import com.amazonservices.mws.products.MarketplaceWebServiceProductsAsyncClient;
 import com.amazonservices.mws.products.MarketplaceWebServiceProductsClient;
@@ -82,6 +87,8 @@ public class AutoSubmitPriceConfig {
     private static MarketplaceWebServiceProductsAsyncClient productClient = null;
     private static MarketplaceWebServiceClient              mwsClient = null;
     
+    public static Map<String, ProductStrategy> strategyMap = new HashMap<String, ProductStrategy>();
+    
     public static int InitConfig(String fileName) {
     	log.setLevel(Level.INFO);
     	
@@ -109,6 +116,11 @@ public class AutoSubmitPriceConfig {
     		if ( MyLog.InitLog(logfileName) != 0 )
     		{
     			return -3;
+    		}
+    		
+    		List<ProductStrategy> staList = xmlReader.readList("Strategy", ProductStrategy.class);
+    		for ( ProductStrategy strategy : staList ) {
+    			strategyMap.put(strategy.asin, strategy);
     		}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -165,6 +177,10 @@ public class AutoSubmitPriceConfig {
         for(String asin : reqAsinList) {
             res += "\n              asin:" + asin;
         }
+        res += "\n Strategy      :";
+        for ( Map.Entry<String, ProductStrategy> entry : strategyMap.entrySet() ) {
+        	res += entry.getValue().toString();
+		}
         res += "\n==========End End End=========================";
     	return res;
     }

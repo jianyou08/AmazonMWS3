@@ -13,35 +13,16 @@
         <ASIN>B004TI336W</ASIN>
         <ASIN>B00EXBDWZC</ASIN>
     </RequestASINList>
-    <HistoryPriceFile>history_price.txt</HistoryPriceFile>
-    <LogFile>get_price.log</LogFile>
-    <Strategy select="SetEQ|SetHigh|SetLow" type="SetEQ" common="当满足条件时设置我的价格和最低价格相同">
+    <HistoryPriceFile>E:/workspace/java/AmazonMWS3/dist/history_price.txt</HistoryPriceFile>
+    <LogFile>E:/workspace/java/AmazonMWS3/dist/get_price.log</LogFile>
+    <Strategy common="">
         <ASIN>B00L21BZ14</ASIN>
-        <LimitMyPriceMin>10.25</LimitMyPriceMin>
-        <LimitMyPriceMax>10.45</LimitMyPriceMax>
-        <Condition>
-            <MyPriceHigh>0.05</MyPriceHigh>
-            <MyPriceLow>0.05</MyPriceLow>
-        </Condition>
-    </Strategy>
-    <Strategy select="SetEQ|SetHigh|SetLow" type="SetHigh" common="当满足条件时设置我的价格比最低价格高DiffValue">
-        <ASIN>B004TI336W</ASIN>
-        <LimitMyPriceMin>10.25</LimitMyPriceMin>
-        <LimitMyPriceMax>10.45</LimitMyPriceMax>
-        <DiffValue>0.01</DiffValue>
-        <Condition>
-            <MyPriceHigh>0.05</MyPriceHigh>
-            <MyPriceLow>0.05</MyPriceLow>
-        </Condition>
-    </Strategy>
-    <Strategy select="SetEQ|SetHigh|SetLow" type="SetLow" common="当满足条件时设置我的价格比最低价格低DiffValue">
-        <ASIN>B00EXBDWZC</ASIN>
-        <LimitMyPriceMin>10.25</LimitMyPriceMin>
-        <LimitMyPriceMax>10.45</LimitMyPriceMax>
-        <DiffValue>0.01</DiffValue>
-        <Condition>
-            <MyPriceHigh>0.05</MyPriceHigh>
-            <MyPriceLow>0.05</MyPriceLow>
-        </Condition>
+        <PriceRangeMin common="商品价格，不包含运费">10.15</PriceRangeMin>
+        <PriceRangeMax common="商品价格，不包含运费">10.45</PriceRangeMax>
+        <SetPriceDiff common="设置与Cmp价格的差异，+表示比它高，-表示比它低，0.0表示相同">-0.01</SetPriceDiff>
+        <Cmp_Type select="competitive|Lowest">competitive</Cmp_Type>
+        <Cmp_Price select="landed|listing">listing</Cmp_Price>
+        <Condition_MyPriceHigh>0.01</Condition_MyPriceHigh>
+        <Condition_MyPriceLow>0.01</Condition_MyPriceLow>
     </Strategy>
 </AmazonMWS>
