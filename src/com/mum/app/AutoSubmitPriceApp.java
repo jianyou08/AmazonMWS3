@@ -28,6 +28,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import com.amazonaws.mws.MarketplaceWebService;
 import com.amazonaws.mws.MarketplaceWebServiceException;
@@ -150,7 +153,17 @@ public class  AutoSubmitPriceApp {
 	}
 	private Map<String, MyPriceInfo> mapMyPriceInfo = new HashMap<String, MyPriceInfo>();
   
-    
+	private String computeContentMD5HeaderValue( InputStream fis ) 
+        throws IOException, NoSuchAlgorithmException {
+        
+        DigestInputStream dis = new DigestInputStream( fis, MessageDigest.getInstance( "MD5" ));
+            
+        byte[] buffer = new byte[8192];
+        while( dis.read( buffer ) > 0 );
+            
+        String md5Content = new String( org.apache.commons.codec.binary.Base64.encodeBase64(dis.getMessageDigest().digest()) );           
+        return md5Content;
+    }
     
     public GetMyPriceForASINResponse GetMyPriceForASIN(
             MarketplaceWebServiceProducts client, 
@@ -325,68 +338,8 @@ public class  AutoSubmitPriceApp {
         try {
             SubmitFeedResponse response = service.submitFeed(request);
 
-            MyLog.log.info("SubmitFeed Action Response");
-            MyLog.log.info("=============================================================================");
-            MyLog.log.info("");
-
-            MyLog.log.info("    SubmitFeedResponse");
-            if (response.isSetSubmitFeedResult()) {
-                MyLog.log.info("        SubmitFeedResult");
-                SubmitFeedResult submitFeedResult = response
-                .getSubmitFeedResult();
-                if (submitFeedResult.isSetFeedSubmissionInfo()) {
-                    MyLog.log.info("            FeedSubmissionInfo");
-                    FeedSubmissionInfo feedSubmissionInfo = submitFeedResult
-                    .getFeedSubmissionInfo();
-                    if (feedSubmissionInfo.isSetFeedSubmissionId()) {
-                        MyLog.log.info("                FeedSubmissionId");
-                        MyLog.log.info("                    "
-                                + feedSubmissionInfo.getFeedSubmissionId());
-                    }
-                    if (feedSubmissionInfo.isSetFeedType()) {
-                        MyLog.log.info("                FeedType");
-                        MyLog.log.info("                    "
-                                + feedSubmissionInfo.getFeedType());
-                    }
-                    if (feedSubmissionInfo.isSetSubmittedDate()) {
-                        MyLog.log.info("                SubmittedDate");
-                        MyLog.log.info("                    "
-                                + feedSubmissionInfo.getSubmittedDate());
-                    }
-                    if (feedSubmissionInfo.isSetFeedProcessingStatus()) {
-                        System.out
-                        .print("                FeedProcessingStatus");
-                        MyLog.log.info("                    "
-                                + feedSubmissionInfo.getFeedProcessingStatus());
-                    }
-                    if (feedSubmissionInfo.isSetStartedProcessingDate()) {
-                        System.out
-                        .print("                StartedProcessingDate");
-                        System.out
-                        .print("                    "
-                                + feedSubmissionInfo
-                                .getStartedProcessingDate());
-                    }
-                    if (feedSubmissionInfo.isSetCompletedProcessingDate()) {
-                        System.out
-                        .print("                CompletedProcessingDate");
-                        MyLog.log.info("                    "
-                                + feedSubmissionInfo
-                                .getCompletedProcessingDate());
-                    }
-                }
-            }
-            if (response.isSetResponseMetadata()) {
-                MyLog.log.info("        ResponseMetadata");
-                ResponseMetadata responseMetadata = response
-                .getResponseMetadata();
-                if (responseMetadata.isSetRequestId()) {
-                    MyLog.log.info("            RequestId");
-                    MyLog.log.info("                "
-                            + responseMetadata.getRequestId());
-                }
-            }
-            MyLog.log.info(response.getResponseHeaderMetadata().toString());
+            MyLog.log.info("SubmitFeed Ok:");
+            MyLog.log.info(response.toXML());
 
         } catch (MarketplaceWebServiceException ex) {
 
@@ -491,13 +444,16 @@ public class  AutoSubmitPriceApp {
 		}
 		
 		Float cmp_otherPrice = null;
+		Float newMyPrice = null;
 		if ( isCmpCompetitive ) {
+			newMyPrice = nowPrice.competitive_ListingPrice;
 			if ( isCmpLanded ) {
 				cmp_otherPrice = nowPrice.competitive_LandedPrice;
 			} else {
 				cmp_otherPrice = nowPrice.competitive_ListingPrice;
 			}
 		} else {
+			newMyPrice = nowPrice.lowest_ListingPrice;
 			if ( isCmpLanded ) {
 				cmp_otherPrice = nowPrice.lowest_LandedPrice;
 			} else {
@@ -507,7 +463,7 @@ public class  AutoSubmitPriceApp {
 		
 		MyLog.log.log(Level.INFO, "cmp_myPrice(" + cmp_myPrice + ") - cmp_otherPrice(" + cmp_otherPrice + ")=" + (cmp_myPrice - cmp_otherPrice) + " conditionRange[>" + strategy.condition_mypriceHigh + ", or <-" + strategy.condition_mypriceLow);
 		if ( (cmp_myPrice - cmp_otherPrice >= strategy.condition_mypriceHigh) || (cmp_otherPrice - cmp_myPrice >= strategy.condition_mypriceLow) ) {
-			Float newMyPrice = cmp_otherPrice + strategy.setDiffPrice;
+			newMyPrice += strategy.setDiffPrice;
 			MyLog.log.log(Level.INFO, "New price:" + asin + "=" + newMyPrice + "(" + cmp_myPrice + ") range[" + strategy.priceRangeMin + "," + strategy.priceRangeMax + "]");
 			if ( (strategy.priceRangeMin <= newMyPrice) && (newMyPrice <= strategy.priceRangeMax) ) {
 				MyLog.log.log(Level.INFO, "In range price, will be update");
@@ -556,7 +512,7 @@ public class  AutoSubmitPriceApp {
     
     public void CheckAndSubmitPrice() {
     	Date dt = new Date();
-    	DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	DateFormat format = new SimpleDateFormat("yyyyMMdd_HHmmss");
     	String dtstr = format.format(dt);
 
     	Map<String, Float> submitSkuMap = new HashMap<String, Float>();
@@ -574,21 +530,20 @@ public class  AutoSubmitPriceApp {
 			String xml = BuildSubmitPriceXml(submitSkuMap);
 			MyLog.log.log(Level.INFO, "Submit XML:\n" + xml);
 			
+			String xmlFilename = AutoSubmitPriceConfig.submitPriceFile + "SubmitPrice_" + dtstr + ".xml";
+			try {
+				FileWriter fileWriter = new FileWriter(xmlFilename, false);
+				fileWriter.write(xml);
+		    	fileWriter.flush();
+		     	fileWriter.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return;
+			}
+			
 			if ( true ) {
-				SubmitFeedRequest request = new SubmitFeedRequest();
-		        request.setMerchant(AutoSubmitPriceConfig.sellerId);
-		        request.setMWSAuthToken(AutoSubmitPriceConfig.sellerDevAuthToken);
-		        request.setMarketplaceIdList(new IdList(Arrays.asList(
-		        		AutoSubmitPriceConfig.marketplaceId)));
-	
-		        request.setFeedType("_POST_PRODUCT_PRICING_DATA_");
-		        try {
-					request.setFeedContent( new ByteArrayInputStream(xml.getBytes("ISO-8859-1")));
-				    //SubmitPriceFeed(AutoSubmitPriceConfig.getServiceClient(), request);
-		        } catch (UnsupportedEncodingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				SubmitPriceFromFile(xmlFilename);
 			}
 		}
 		else {
@@ -607,13 +562,21 @@ public class  AutoSubmitPriceApp {
 
         request.setFeedType("_POST_PRODUCT_PRICING_DATA_");
         try {
-			request.setFeedContent( new FileInputStream(xmlFilename));
+        	FileInputStream fis = new FileInputStream(xmlFilename);
+			request.setFeedContent( fis );
+			String contentMd5 = computeContentMD5HeaderValue( fis );
+			fis.getChannel().position( 0 );
+	        request.setContentMD5( contentMd5 );
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return;
 		}
-    	//SubmitPriceFeed(AutoSubmitPriceConfig.getServiceClient(), request);
+		catch( Throwable e ) {
+			e.printStackTrace();
+			return;
+        }
+    	SubmitPriceFeed(AutoSubmitPriceConfig.getServiceClient(), request);
     }
 
 
@@ -636,30 +599,31 @@ public class  AutoSubmitPriceApp {
     	
     	AutoSubmitPriceApp handler = new AutoSubmitPriceApp();
     	
-    	if ( (args.length == 3) && args[1].equals("1") ) {
-    		handler.SubmitPriceFromFile(args[2]);
-    		return;
-    	}
-    	else if ( (args.length == 2) && args[1].equals("2") )
+    	
+    	if ( (args.length == 2) && args[1].equals("1") )
     	{
     		handler.queryProductPrice(); 
     		handler.logPrice2File();
     	}
-    	else if ( (args.length == 2) && args[1].equals("3") ) {
+    	else if ( (args.length == 3) && args[1].equals("20") ) {
+    		handler.queryProductPrice(); 
+    		handler.SubmitPriceFromFile(args[2]);
+    	}
+    	else if ( (args.length == 2) && args[1].equals("21") ) {
     		handler.queryProductPrice();
     		handler.CheckAndSubmitPrice();
     	}
-    	else if ( (args.length == 2) && args[1].equals("4") ) {
+    	else if ( (args.length == 2) && args[1].equals("22") ) {
     		handler.queryProductPrice();
     		handler.logPrice2File();
     		handler.CheckAndSubmitPrice();
     	}
     	else {
     		String usage = "\n Usage configfile [params] \n"
-    				+ "                  [1 xmlfile]      submit price from xml file \n"
-    				+ "                  [2]      	      Only update price to history_price.txt \n"
-    				+ "                  [3]              Auto get price and submit price by strategy \n"
-    				+ "                  [4]              log to histtory_price.txt and submit price by strategy \n";
+    				+ "                  [1]      	      Only update price to history_price.txt \n"
+    				+ "                  [20 xmlfile]      submit price from xml file \n"
+    				+ "                  [21]              Auto get price and submit price by strategy \n"
+    				+ "                  [22]              log to histtory_price.txt and submit price by strategy \n";
     		
     		System.out.print(usage);
     		MyLog.log.log(Level.WARNING, usage);

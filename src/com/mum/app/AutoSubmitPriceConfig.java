@@ -80,6 +80,7 @@ public class AutoSubmitPriceConfig {
     public static String marketplaceId = "";
     public static List<String> reqAsinList;
     public static String historyPriceFile = "";
+    public static String submitPriceFile = "./";
     
     public static Logger log = Logger.getLogger("amazon-mws"); 
     
@@ -117,6 +118,8 @@ public class AutoSubmitPriceConfig {
     		{
     			return -3;
     		}
+    		
+    		submitPriceFile = xmlReader.read("SubmitPriceFileDir", String.class);
     		
     		List<ProductStrategy> staList = xmlReader.readList("Strategy", ProductStrategy.class);
     		for ( ProductStrategy strategy : staList ) {

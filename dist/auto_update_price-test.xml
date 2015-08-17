@@ -15,14 +15,15 @@
     </RequestASINList>
     <HistoryPriceFile>E:/workspace/java/AmazonMWS3/dist/history_price.txt</HistoryPriceFile>
     <LogFile>E:/workspace/java/AmazonMWS3/dist/get_price.log</LogFile>
+    <SubmitPriceFileDir>./</SubmitPriceFileDir>
     <Strategy common="">
-        <ASIN>B00L21BZ14</ASIN>
-        <PriceRangeMin common="商品价格，不包含运费">10.15</PriceRangeMin>
-        <PriceRangeMax common="商品价格，不包含运费">10.45</PriceRangeMax>
-        <SetPriceDiff common="设置与Cmp价格的差异，+表示比它高，-表示比它低，0.0表示相同">-0.01</SetPriceDiff>
-        <Cmp_Type select="competitive|Lowest">competitive</Cmp_Type>
+        <ASIN>B00PU4CTGO</ASIN>
+        <PriceRangeMin common="商品展示价格区间，不含运费">9.50</PriceRangeMin>
+        <PriceRangeMax common="商品展示价格区间，不含运费">10.50</PriceRangeMax>
+        <SetPriceDiff common="在Cmp_Type指定的展示价格基础上加上这个金额，可以是负数">+6.35</SetPriceDiff>
+        <Cmp_Type select="competitive|Lowest">Lowest</Cmp_Type>
         <Cmp_Price select="landed|listing">listing</Cmp_Price>
-        <Condition_MyPriceHigh>0.01</Condition_MyPriceHigh>
-        <Condition_MyPriceLow>0.01</Condition_MyPriceLow>
+        <Condition_MyPriceHigh>6.32</Condition_MyPriceHigh>
+        <Condition_MyPriceLow>10</Condition_MyPriceLow>
     </Strategy>
 </AmazonMWS>
