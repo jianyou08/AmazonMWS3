@@ -465,14 +465,14 @@ public class  AutoSubmitPriceApp {
 		MyLog.log.log(Level.INFO, "cmp_myPrice(" + cmp_myPrice + ") - cmp_otherPrice(" + cmp_otherPrice + ")=" + (cmp_myPrice - cmp_otherPrice) + " conditionRange[>" + strategy.condition_mypriceHigh + ", or <-" + strategy.condition_mypriceLow);
 		if ( (cmp_myPrice - cmp_otherPrice >= strategy.condition_mypriceHigh) || (cmp_otherPrice - cmp_myPrice >= strategy.condition_mypriceLow) ) {
 			newMyPrice += strategy.setDiffPrice;
-			MyLog.log.log(Level.INFO, "New price:" + asin + "=" + newMyPrice + "(" + cmp_myPrice + ") range[" + strategy.priceRangeMin + "," + strategy.priceRangeMax + "]");
+			MyLog.log.log(Level.INFO, "New price:" + asin + "=" + newMyPrice + "(" + nowPrice.listingPrice + ") range[" + strategy.priceRangeMin + "," + strategy.priceRangeMax + "]");
 			if ( (strategy.priceRangeMin <= newMyPrice) && (newMyPrice <= strategy.priceRangeMax) ) {
 				float diffPrice = newMyPrice - nowPrice.listingPrice;
-				if ( (-0.0001 <= diffPrice) && (diffPrice <= -0.001) ) {
+				if ( (-0.001 <= diffPrice) && (diffPrice <= 0.001) ) {
 					MyLog.log.log(Level.INFO, "newMyPrice(" + newMyPrice + ") equry nowPrice(" + nowPrice.listingPrice + ") no need submit");
 					return null;
 				}
-				MyLog.log.log(Level.INFO, "In range price, will be submit" + newMyPrice);
+				MyLog.log.log(Level.INFO, "In range price, will be submit: " + newMyPrice + "(diffPrice:" + diffPrice + ")");
 				return newMyPrice;
 			}
 			else {
