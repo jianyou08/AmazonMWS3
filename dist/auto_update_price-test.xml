@@ -13,9 +13,9 @@
         <ASIN>B004TI336W</ASIN>
         <ASIN>B00EXBDWZC</ASIN>
     </RequestASINList>
-    <HistoryPriceFile>E:/workspace/java/AmazonMWS3/dist/history_price.txt</HistoryPriceFile>
-    <LogFile>E:/workspace/java/AmazonMWS3/dist/get_price.log</LogFile>
-    <SubmitPriceFileDir>./</SubmitPriceFileDir>
+    <HistoryPriceFile>./log/history_price.txt</HistoryPriceFile>
+    <LogFile>./log/get_price.log</LogFile>
+    <SubmitPriceFileDir>./log/</SubmitPriceFileDir>
     <Strategy common="">
         <ASIN>B00PU4CTGO</ASIN>
         <PriceRangeMin common="商品展示价格区间，不含运费">9.50</PriceRangeMin>

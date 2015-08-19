@@ -28,6 +28,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -466,7 +467,12 @@ public class  AutoSubmitPriceApp {
 			newMyPrice += strategy.setDiffPrice;
 			MyLog.log.log(Level.INFO, "New price:" + asin + "=" + newMyPrice + "(" + cmp_myPrice + ") range[" + strategy.priceRangeMin + "," + strategy.priceRangeMax + "]");
 			if ( (strategy.priceRangeMin <= newMyPrice) && (newMyPrice <= strategy.priceRangeMax) ) {
-				MyLog.log.log(Level.INFO, "In range price, will be update");
+				float diffPrice = newMyPrice - nowPrice.listingPrice;
+				if ( (-0.0001 <= diffPrice) && (diffPrice <= -0.001) ) {
+					MyLog.log.log(Level.INFO, "newMyPrice(" + newMyPrice + ") equry nowPrice(" + nowPrice.listingPrice + ") no need submit");
+					return null;
+				}
+				MyLog.log.log(Level.INFO, "In range price, will be submit" + newMyPrice);
 				return newMyPrice;
 			}
 			else {
@@ -499,7 +505,11 @@ public class  AutoSubmitPriceApp {
 	    	xmlBuilder.write("SKU", entry.getKey());
 	    	xmlBuilder.beginObject("StandardPrice");
 	    	xmlBuilder.writeAttribute("currency", "USD");
-	    	xmlBuilder.writeValue(entry.getValue().toString());
+	    	//保留两位小数
+	    	BigDecimal b = new BigDecimal(entry.getValue()); 
+	    	Float fvalue = b.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue(); 
+	    	xmlBuilder.writeValue(fvalue.toString());
+	    	
 	    	xmlBuilder.endObject("StandardPrice");
 	    	xmlBuilder.endObject("Price");
 	    	xmlBuilder.endObject("Message");
